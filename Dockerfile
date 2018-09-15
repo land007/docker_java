@@ -2,14 +2,25 @@ FROM land007/ubuntu:latest
 
 MAINTAINER Yiqiu Jia <yiqiujia@hotmail.com>
 
-ENV JVM_VERSION jdk1.8.0_181
-# ADD install/$JVM_VERSION-linux-x64.tar.gz /usr/local
-RUN cd /tmp && wget http://download.oracle.com/otn-pub/java/jdk/8u181-b13/96a7b8442fe848ef90c96a2fad6ed6d1/jdk-8u181-linux-x64.tar.gz && tar -C /usr/local -xzf jdk-8u181-linux-x64.tar.gz && rm -f jdk-8u181-linux-x64.tar.gz
-ENV JAVA_HOME /usr/local/$JVM_VERSION
+# Install Java.
+RUN \
+  echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
+  add-apt-repository -y ppa:webupd8team/java && \
+  apt-get update && \
+  apt-get install -y oracle-java8-installer && \
+  rm -rf /var/lib/apt/lists/* && \
+  rm -rf /var/cache/oracle-jdk8-installer
+
+
+# Define working directory.
+WORKDIR /data
+
+# Define commonly used JAVA_HOME variable
+ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 ENV CLASSPATH .:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
 ENV PATH $PATH:$JAVA_HOME/bin
 
-RUN echo 'export JVM_VERSION=jdk1.8.0_181' >> /etc/profile && echo 'export JAVA_HOME=/usr/local/$JVM_VERSION' >> /etc/profile && echo 'export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar' >> /etc/profile && echo 'export PATH=$PATH:$JAVA_HOME/bin' >> /etc/profile
+RUN echo 'export JAVA_HOME=/usr/lib/jvm/java-8-oracle' >> /etc/profile && echo 'export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar' >> /etc/profile && echo 'export PATH=$PATH:$JAVA_HOME/bin' >> /etc/profile
 
 
 #docker stop java ; docker rm java ; docker run -it --privileged --name java land007/java:latest
