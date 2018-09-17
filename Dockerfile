@@ -1,4 +1,4 @@
-FROM land007/ubuntu:latest
+FROM land007/debian:latest
 
 MAINTAINER Yiqiu Jia <yiqiujia@hotmail.com>
 
