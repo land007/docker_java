@@ -12,16 +12,25 @@ RUN \
   rm -rf /var/lib/apt/lists/* && \
   rm -rf /var/cache/oracle-jdk8-installer
 
-
-# Define working directory.
-WORKDIR /data
-
 # Define commonly used JAVA_HOME variable
 ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 ENV CLASSPATH .:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
 ENV PATH $PATH:$JAVA_HOME/bin
-
 RUN echo 'export JAVA_HOME=/usr/lib/jvm/java-8-oracle' >> /etc/profile && echo 'export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar' >> /etc/profile && echo 'export PATH=$PATH:$JAVA_HOME/bin' >> /etc/profile
 
+# Define working directory.
+RUN mkdir /java
+#ADD java /java
+WORKDIR /java
+RUN ln -s /java ~/
+RUN ln -s /java /home/land007
+RUN mv /java /node_
+VOLUME ["/java"]
+ADD check.sh /
+RUN sed -i 's/\r$//' /check.sh
+RUN chmod a+x /check.sh
+
+CMD /check.sh /java ; /etc/init.d/ssh start ; bash
+EXPOSE 8080
 
 #docker stop java ; docker rm java ; docker run -it --privileged --name java land007/java:latest
