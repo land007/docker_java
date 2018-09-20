@@ -3,7 +3,7 @@ FROM land007/debian:latest
 MAINTAINER Yiqiu Jia <yiqiujia@hotmail.com>
 
 # Install Java.
-RUN apt-get install -y software-properties-common
+#RUN apt-get install -y software-properties-common
 RUN \
   echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
   add-apt-repository -y ppa:webupd8team/java && \
@@ -24,7 +24,7 @@ RUN mkdir /java
 WORKDIR /java
 RUN ln -s /java ~/
 RUN ln -s /java /home/land007
-RUN mv /java /node_
+RUN mv /java /java_
 VOLUME ["/java"]
 ADD check.sh /
 RUN sed -i 's/\r$//' /check.sh
