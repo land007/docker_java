@@ -30,14 +30,14 @@ ADD check.sh /
 RUN sed -i 's/\r$//' /check.sh
 RUN chmod a+x /check.sh
 
-ENV CodeMeter_Server 192.168.86.8
-#RUN apt-get install -y libfontconfig1 libfreetype6 libice6 libsm6
 ADD codemeter_6.70.3152.500_amd64.deb /tmp
+RUN apt-get update && apt-get install -y libfontconfig1 libfreetype6 libice6 libsm6
 RUN dpkg -i /tmp/codemeter_6.70.3152.500_amd64.deb && rm -f /tmp/codemeter_6.70.3152.500_amd64.deb
 RUN service codemeter start && service codemeter status && cmu -l
 RUN echo '[ServerSearchList\Server1]' >> /etc/wibu/CodeMeter/Server.ini
+#RUN echo 'Address=192.168.86.8' >> /etc/wibu/CodeMeter/Server.ini
 RUN service codemeter start && service codemeter status && cmu -k
-
+ENV CodeMeter_Server 192.168.86.8
 
 ADD start.sh /
 RUN sed -i 's/\r$//' /start.sh
@@ -46,3 +46,4 @@ CMD /check.sh /java ; /etc/init.d/ssh start ; service codemeter start ; sleep 2 
 EXPOSE 8080
 
 #docker stop java ; docker rm java ; docker run -it --privileged --name java land007/java:codemeter
+#docker stop test ; docker rm test ; docker run -it --privileged --name test 4140b2ea3129
