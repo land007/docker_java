@@ -37,8 +37,9 @@ RUN apt-get update && apt-get install -y libfontconfig1 libfreetype6 libice6 lib
 RUN dpkg -i /tmp/codemeter_6.70.3152.500_amd64.deb && rm -f /tmp/codemeter_6.70.3152.500_amd64.deb
 RUN service codemeter start && service codemeter status && cmu -l
 RUN echo '[ServerSearchList\Server1]' >> /etc/wibu/CodeMeter/Server.ini
+RUN cat /etc/wibu/CodeMeter/Server.ini
 #RUN echo 'Address=192.168.86.8' >> /etc/wibu/CodeMeter/Server.ini
-RUN service codemeter start && service codemeter status && cmu -k
+#RUN service codemeter start && service codemeter status && cmu -k
 ENV CodeMeter_Server 192.168.86.8
 
 CMD /check.sh /java ; /etc/init.d/ssh start ; service codemeter start ; sleep 2 ; /java/start.sh
