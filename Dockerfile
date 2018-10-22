@@ -31,7 +31,7 @@ RUN sed -i 's/\r$//' /check.sh
 RUN chmod a+x /check.sh
 
 ENV CodeMeter_Server 192.168.86.8
-RUN apt-get install -y libfontconfig1 libfreetype6 libice6 libsm6
+#RUN apt-get install -y libfontconfig1 libfreetype6 libice6 libsm6
 ADD codemeter_6.70.3152.500_amd64.deb /tmp
 RUN dpkg -i /tmp/codemeter_6.70.3152.500_amd64.deb && rm -f /tmp/codemeter_6.70.3152.500_amd64.deb
 RUN service codemeter start && service codemeter status && cmu -l
