@@ -6,4 +6,5 @@ else
 echo "${DIR} is Empty"
 echo "cp -R ${DIR}_ ${DIR}"
 cp -R ${DIR}_/* ${DIR}
+echo "Address=${CodeMeter_Server}" >> /etc/wibu/CodeMeter/Server.ini
 fi
