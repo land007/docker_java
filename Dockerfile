@@ -19,8 +19,8 @@ ENV PATH $PATH:$JAVA_HOME/bin
 RUN echo 'export JAVA_HOME=/usr/lib/jvm/java-8-oracle' >> /etc/profile && echo 'export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar' >> /etc/profile && echo 'export PATH=$PATH:$JAVA_HOME/bin' >> /etc/profile
 
 # Define working directory.
-RUN mkdir /java
-#ADD java /java
+#RUN mkdir /java
+ADD java /java
 WORKDIR /java
 RUN ln -s /java ~/
 RUN ln -s /java /home/land007
@@ -29,6 +29,8 @@ VOLUME ["/java"]
 ADD check.sh /
 RUN sed -i 's/\r$//' /check.sh
 RUN chmod a+x /check.sh
+RUN sed -i 's/\r$//' /java_/start.sh
+RUN chmod a+x /java_/start.sh
 
 ADD codemeter_6.70.3152.500_amd64.deb /tmp
 RUN apt-get update && apt-get install -y libfontconfig1 libfreetype6 libice6 libsm6
@@ -39,10 +41,7 @@ RUN echo '[ServerSearchList\Server1]' >> /etc/wibu/CodeMeter/Server.ini
 RUN service codemeter start && service codemeter status && cmu -k
 ENV CodeMeter_Server 192.168.86.8
 
-ADD start.sh /
-RUN sed -i 's/\r$//' /start.sh
-RUN chmod a+x /start.sh
-CMD /check.sh /java ; /etc/init.d/ssh start ; service codemeter start ; sleep 2 ; /start.sh
+CMD /check.sh /java ; /etc/init.d/ssh start ; service codemeter start ; sleep 2 ; /java/start.sh
 EXPOSE 8080
 
 #docker stop java ; docker rm java ; docker run -it --privileged --name java land007/java:codemeter
