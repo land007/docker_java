@@ -21,10 +21,10 @@ RUN echo 'export JAVA_HOME=/usr/lib/jvm/java-8-oracle' >> /etc/profile && echo '
 # Define working directory.
 RUN mkdir /java
 #ADD java /java
-WORKDIR /java
 RUN ln -s /java ~/
 RUN ln -s /java /home/land007
 RUN mv /java /java_
+WORKDIR /java
 VOLUME ["/java"]
 ADD check.sh /
 RUN sed -i 's/\r$//' /check.sh
