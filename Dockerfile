@@ -32,9 +32,17 @@ ADD check.sh /
 RUN sed -i 's/\r$//' /check.sh && \
 	chmod a+x /check.sh
 
+RUN echo $(date "+%Y-%m-%d_%H:%M:%S") >> /.image_times && \
+	echo $(date "+%Y-%m-%d_%H:%M:%S") > /.image_time  && \
+	echo "land007/java" >> /.image_names  && \
+	echo "land007/java" > /.image_name 
+ADD analytics.sh /
+ADD start.sh /
+RUN chmod +x /*.sh
+
 EXPOSE 8080
 EXPOSE 22/tcp
 
-CMD /check.sh /java ; /usr/sbin/sshd ; bash
+CMD /check.sh /java ; /usr/sbin/sshd ; /start.sh ; bash
 
 #docker stop java ; docker rm java ; docker run -it --privileged --name java land007/java:latest
