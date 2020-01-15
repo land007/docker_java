@@ -1,52 +1,26 @@
-FROM land007/debian:latest
+FROM openjdk:latest
 
 MAINTAINER Yiqiu Jia <yiqiujia@hotmail.com>
 
-# Setup JAVA_HOME
-ENV JAVA_HOME="/usr/lib/jvm/default-jvm"
+RUN yum update -y \
+	&& yum install -y initscripts net-tools vim*  curl wget unzip screen openssh-server git subversion locales \
+#	gcc-c++ make openssl-devel \
+#	&& yum groupinstall -y Chinese-support \
+	&& yum clean all
+RUN locale -a
+#ENV LC_ALL zh_CN.UTF-8
+#RUN sed -i 's/en_US.UTF-8/zh_CN.UTF-8/g' /etc/sysconfig/i18n
+#RUN sed -i 's/#Port 22/Port 20022/g' /etc/ssh/sshd_config
 
-# Install Oracle JDK (Java SE Development Kit) 11.0.1
-RUN JAVA_VERSION=11 && \
-    JAVA_UPDATE=0.1 && \
-    JAVA_BUILD=13 && \
-    JAVA_PATH=90cf5d8f270a4347a95050320eef3fb7 && \
-    JAVA_SHA256_SUM=e7fd856bacad04b6dbf3606094b6a81fa9930d6dbb044bbd787be7ea93abc885 && \
-    apt-get update && \
-    apt-get -y install wget && \
-    cd "/tmp" && \
-    wget --header "Cookie: oraclelicense=accept-securebackup-cookie;" "http://download.oracle.com/otn-pub/java/jdk/${JAVA_VERSION}.${JAVA_UPDATE}+${JAVA_BUILD}/${JAVA_PATH}/jdk-${JAVA_VERSION}.${JAVA_UPDATE}_linux-x64_bin.tar.gz" && \
-    echo "${JAVA_SHA256_SUM}" "jdk-${JAVA_VERSION}.${JAVA_UPDATE}_linux-x64_bin.tar.gz" | sha256sum -c - && \
-    tar -xzf "jdk-${JAVA_VERSION}.${JAVA_UPDATE}_linux-x64_bin.tar.gz" && \
-    mkdir -p "/usr/lib/jvm" && \
-    mv "/tmp/jdk-${JAVA_VERSION}.${JAVA_UPDATE}" "/usr/lib/jvm/java-${JAVA_VERSION}-oracle" && \
-    ln -s "java-${JAVA_VERSION}-oracle" "$JAVA_HOME" && \
-    ln -s "$JAVA_HOME/bin/"* "/usr/bin/" && \
-    rm -rf "$JAVA_HOME/README.html" \
-           "$JAVA_HOME/bin/jjs" \
-           "$JAVA_HOME/bin/keytool" \
-           "$JAVA_HOME/bin/pack200" \
-           "$JAVA_HOME/bin/rmid" \
-           "$JAVA_HOME/bin/rmiregistry" \
-           "$JAVA_HOME/bin/unpack200" \   
-           "$JAVA_HOME/conf/security/policy/README.txt" \    
-           "$JAVA_HOME/lib/jfr" \
-           "$JAVA_HOME/lib/src.zip" && \
-    apt-get -y autoremove wget && \
-    apt-get -y clean && \
-    rm -rf "/tmp/"* \
-           "/var/cache/apt" \
-           "/usr/share/man" \
-           "/usr/share/doc" \
-           "/usr/share/doc-base" \
-           "/usr/share/info/*"
-# Define commonly used JAVA_HOME variable
-ENV JAVA_HOME /usr/lib/jvm/java-11-oracle \
-	CLASSPATH .:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar \
-	PATH $PATH:$JAVA_HOME/bin
-RUN echo 'export JAVA_HOME=/usr/lib/jvm/java-11-oracle' >> /etc/profile && echo 'export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar' >> /etc/profile && echo 'export PATH=$PATH:$JAVA_HOME/bin' >> /etc/profile
+RUN useradd -s /bin/bash -m land007
+RUN echo "land007:1234567" | /usr/sbin/chpasswd
+#land007:x:1000:1000::/home/land007:/bin/bash
+RUN sed -i "s/^land007:x.*/land007:x:0:1000::\/home\/land007:\/bin\/bash/g" /etc/passwd
 
-# Define working directory.
-#RUN mkdir /java
+RUN mkdir /var/run/sshd
+#RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -N '' 
+RUN ssh-keygen -A
+
 ADD java /java
 RUN cd /java && javac Main.java && \
 	ln -s /java ~/ && \
@@ -58,7 +32,9 @@ ADD check.sh /
 RUN sed -i 's/\r$//' /check.sh && \
 	chmod a+x /check.sh
 
-CMD /check.sh /java ; /etc/init.d/ssh start ; bash
 EXPOSE 8080
+EXPOSE 22/tcp
+
+CMD /check.sh /java ; /usr/sbin/sshd ; bash
 
 #docker stop java ; docker rm java ; docker run -it --privileged --name java land007/java:latest
