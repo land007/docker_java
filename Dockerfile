@@ -43,6 +43,6 @@ RUN chmod +x /*.sh
 EXPOSE 8080
 EXPOSE 22/tcp
 
-CMD /check.sh /java ; /usr/sbin/sshd ; /start.sh ; bash
+CMD /start.sh ; bash
 
 #docker stop java ; docker rm java ; docker run -it --privileged --name java land007/java:latest
