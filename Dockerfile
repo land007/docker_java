@@ -29,20 +29,20 @@ RUN cd /java && javac Main.java && \
 WORKDIR /java
 VOLUME ["/java"]
 ADD check.sh /
-RUN sed -i 's/\r$//' /check.sh && \
-	chmod a+x /check.sh
-
-RUN echo $(date "+%Y-%m-%d_%H:%M:%S") >> /.image_times && \
-	echo $(date "+%Y-%m-%d_%H:%M:%S") > /.image_time  && \
-	echo "land007/java" >> /.image_names  && \
-	echo "land007/java" > /.image_name 
 ADD analytics.sh /
 ADD start.sh /
-RUN chmod +x /*.sh
+ADD task.sh /
+RUN sed -i 's/\r$//' /check.sh && \
+#	chmod a+x /check.sh && \
+	echo $(date "+%Y-%m-%d_%H:%M:%S") >> /.image_times && \
+	echo $(date "+%Y-%m-%d_%H:%M:%S") > /.image_time  && \
+	echo "land007/java" >> /.image_names  && \
+	echo "land007/java" > /.image_name  && \
+	chmod +x /*.sh
 
 EXPOSE 8080
 EXPOSE 22/tcp
 
-CMD /start.sh ; bash
+CMD /task.sh ; /start.sh ; bash
 
 #docker stop java ; docker rm java ; docker run -it --privileged --name java land007/java:latest
