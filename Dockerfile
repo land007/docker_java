@@ -4,22 +4,13 @@ MAINTAINER Yiqiu Jia <yiqiujia@hotmail.com>
 
 RUN yum update -y \
 	&& yum install -y initscripts net-tools vim*  curl wget unzip screen openssh-server git subversion locales \
-#	gcc-c++ make openssl-devel \
-#	&& yum groupinstall -y Chinese-support \
 	&& yum clean all
-RUN locale -a
-#ENV LC_ALL zh_CN.UTF-8
-#RUN sed -i 's/en_US.UTF-8/zh_CN.UTF-8/g' /etc/sysconfig/i18n
-#RUN sed -i 's/#Port 22/Port 20022/g' /etc/ssh/sshd_config
-
-RUN useradd -s /bin/bash -m land007
-RUN echo "land007:1234567" | /usr/sbin/chpasswd
-#land007:x:1000:1000::/home/land007:/bin/bash
-RUN sed -i "s/^land007:x.*/land007:x:0:1000::\/home\/land007:\/bin\/bash/g" /etc/passwd
-
-RUN mkdir /var/run/sshd
-#RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -N '' 
-RUN ssh-keygen -A
+RUN locale -a && \
+	useradd -s /bin/bash -m land007 && \
+	echo "land007:1234567" | /usr/sbin/chpasswd && \
+	sed -i "s/^land007:x.*/land007:x:0:1000::\/home\/land007:\/bin\/bash/g" /etc/passwd && \
+	mkdir /var/run/sshd && \
+	ssh-keygen -A
 
 ADD java /java
 RUN cd /java && javac Main.java && \
@@ -28,21 +19,21 @@ RUN cd /java && javac Main.java && \
 	mv /java /java_
 WORKDIR /java
 VOLUME ["/java"]
-ADD check.sh /
-ADD analytics.sh /
-ADD start.sh /
-ADD task.sh /
-RUN sed -i 's/\r$//' /check.sh && \
-#	chmod a+x /check.sh && \
+ADD check.sh / \
+	analytics.sh / \
+	start.sh / \
+	task.sh /
+RUN sed -i 's/\r$//' /*.sh && chmod +x /*.sh && \
 	echo $(date "+%Y-%m-%d_%H:%M:%S") >> /.image_times && \
-	echo $(date "+%Y-%m-%d_%H:%M:%S") > /.image_time  && \
-	echo "land007/java" >> /.image_names  && \
-	echo "land007/java" > /.image_name  && \
-	chmod +x /*.sh
+	echo $(date "+%Y-%m-%d_%H:%M:%S") > /.image_time && \
+	echo "land007/java" >> /.image_names && \
+	echo "land007/java" > /.image_name
+	
 
-EXPOSE 8080
-EXPOSE 22/tcp
+EXPOSE 8080/tcp \
+	22/tcp
 
 CMD /task.sh ; /start.sh ; bash
 
+#docker build -t land007/java:latest .
 #docker stop java ; docker rm java ; docker run -it --privileged --name java land007/java:latest
