@@ -19,10 +19,7 @@ RUN cd /java && javac Main.java && \
 	mv /java /java_
 WORKDIR /java
 VOLUME ["/java"]
-ADD check.sh / \
-	analytics.sh / \
-	start.sh / \
-	task.sh /
+ADD *.sh /
 RUN sed -i 's/\r$//' /*.sh && chmod +x /*.sh && \
 	echo $(date "+%Y-%m-%d_%H:%M:%S") >> /.image_times && \
 	echo $(date "+%Y-%m-%d_%H:%M:%S") > /.image_time && \
